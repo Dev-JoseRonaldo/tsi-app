@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,14 +25,17 @@ public class MainActivity extends AppCompatActivity {
     private EditText searchInput;
     private RecyclerView bookList;
     private BookAdapter adapter;
+    private TextView emptyMessage;
     private final OkHttpClient client = new OkHttpClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         searchInput = findViewById(R.id.searchInput);
         bookList = findViewById(R.id.bookList);
+        emptyMessage = findViewById(R.id.emptyMessage);
         Button searchButton = findViewById(R.id.searchButton);
 
         bookList.setLayoutManager(new LinearLayoutManager(this));
@@ -46,8 +51,10 @@ public class MainActivity extends AppCompatActivity {
 
         client.newCall(request).enqueue(new Callback() {
             @Override public void onFailure(Call call, IOException e) { e.printStackTrace(); }
+
             @Override public void onResponse(Call call, Response response) throws IOException {
                 if (!response.isSuccessful()) return;
+
                 try {
                     JSONObject json = new JSONObject(response.body().string());
                     JSONArray docs = json.getJSONArray("docs");
@@ -64,9 +71,17 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     runOnUiThread(() -> {
-                        adapter = new BookAdapter(books);
-                        bookList.setAdapter(adapter);
+                        if (books.isEmpty()) {
+                            emptyMessage.setVisibility(View.VISIBLE);
+                            bookList.setVisibility(View.GONE);
+                        } else {
+                            emptyMessage.setVisibility(View.GONE);
+                            bookList.setVisibility(View.VISIBLE);
+                            adapter = new BookAdapter(books);
+                            bookList.setAdapter(adapter);
+                        }
                     });
+
                 } catch (Exception e) { e.printStackTrace(); }
             }
         });
