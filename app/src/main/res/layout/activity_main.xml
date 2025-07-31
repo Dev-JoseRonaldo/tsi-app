@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/home_bk"
-    tools:context=".MainActivity">
+    android:padding="16dp"
+    android:orientation="vertical">
 
-    <TextView
-    android:id="@+id/helloText"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Hello World!"
-    android:textSize="24sp"
-    android:textColor="#000000"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+  <EditText
+      android:id="@+id/searchInput"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="172dp"
+      android:hint="Digite o nome do livro" />
 
+  <Button
+      android:id="@+id/searchButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Buscar" />
+
+  <Space
+      android:layout_width="match_parent"
+      android:layout_height="32dp" />
+
+  <androidx.recyclerview.widget.RecyclerView
+      android:id="@+id/bookList"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1"/>
+</LinearLayout>
