@@ -1,23 +1,25 @@
 package com.example.tsi_app;
 
 import android.os.Bundle;
-
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -26,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView bookList;
     private BookAdapter adapter;
     private TextView emptyMessage;
-    private final OkHttpClient client = new OkHttpClient();
+    private OkHttpClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +40,13 @@ public class MainActivity extends AppCompatActivity {
         emptyMessage = findViewById(R.id.emptyMessage);
         Button searchButton = findViewById(R.id.searchButton);
 
+        // Inicializa o RecyclerView
         bookList.setLayoutManager(new LinearLayoutManager(this));
         adapter = new BookAdapter(new ArrayList<>());
         bookList.setAdapter(adapter);
+
+        // Inicializa o cliente com SSL Pinning
+        client = MyHttpClient.createClient();
 
         searchButton.setOnClickListener(v -> searchBooks(searchInput.getText().toString()));
     }
@@ -50,9 +56,16 @@ public class MainActivity extends AppCompatActivity {
         Request request = new Request.Builder().url(url).build();
 
         client.newCall(request).enqueue(new Callback() {
-            @Override public void onFailure(Call call, IOException e) { e.printStackTrace(); }
+            @Override
+            public void onFailure(Call call, IOException e) {
+                if (e instanceof javax.net.ssl.SSLPeerUnverifiedException) {
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Falha na verificação do certificado (SSL Pinning)", Toast.LENGTH_LONG).show());
+                }
+                e.printStackTrace();
+            }
 
-            @Override public void onResponse(Call call, Response response) throws IOException {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
                 if (!response.isSuccessful()) return;
 
                 try {
@@ -82,7 +95,9 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
 
-                } catch (Exception e) { e.printStackTrace(); }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
