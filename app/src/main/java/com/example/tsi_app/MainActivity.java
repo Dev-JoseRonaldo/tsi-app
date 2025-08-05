@@ -35,6 +35,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Verifica root e exibe aviso
+        if (RootCheck.isDeviceRooted()) {
+            Toast.makeText(this, "Aviso: dispositivo rooteado detectado.", Toast.LENGTH_LONG).show();
+        }
+
         searchInput = findViewById(R.id.searchInput);
         bookList = findViewById(R.id.bookList);
         emptyMessage = findViewById(R.id.emptyMessage);
